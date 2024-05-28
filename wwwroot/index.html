@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+    <title>Bank WebAPI</title>
+<script>
+    function handleGoToSwagger() {
+        window.location.href = "/swagger";
+    }
+    function handleGoToFrontend() {
+        alert("Not implemented yet")
+        window.location.href = "";
+    }
+</script>
+    <style>
+        html{
+            height: 100%;
+        }
+        body{
+            height: 100%;
+        }
+        #buttonBox{
+            display: flex;
+            width: 100%;
+            height: 100%;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .buttons {
+            width: 35%;
+            height: auto;
+            background-color: unset;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="buttonBox">
+    <button onclick="handleGoToSwagger()" class="buttons"><img src="/android-chrome-512x512.png" alt="Logo" /></button>
+    <button onclick="handleGoToFrontend()" class="buttons"><img src="/frontend.png" alt="Logo" /></button>
+    </div>
+</body>
+
+</html>
