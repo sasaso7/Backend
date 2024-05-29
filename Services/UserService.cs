@@ -1,12 +1,115 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BankBackend.Database.Models;
+using EFGetStarted.Database;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankBackend.Services
 {
-    internal class UserService
+    public interface IUserService
     {
+        Task<IEnumerable<User>> GetUsersAsync();
+        Task<User?> GetUserByIdAsync(string id);
+        Task<User> CreateUserAsync(User user, string password);
+        Task<bool> UpdateUserAsync(string id, User user);
+        Task<bool> DeleteUserAsync(string id);
+        Task<bool> AddAccountToUserAsync(string userId, Account account);
+        Task<bool> RemoveAccountFromUserAsync(string userId, string accountId);
+    }
+
+    public class UserService : IUserService
+    {
+        private readonly UserManager<User> _userManager;
+        private readonly ApplicationDbContext _context;
+
+        public UserService(UserManager<User> userManager, ApplicationDbContext context)
+        {
+            _userManager = userManager;
+            _context = context;
+        }
+
+        public async Task<IEnumerable<User>> GetUsersAsync()
+        {
+            return await _userManager.Users.Include(u => u.Accounts).ToListAsync();
+        }
+
+        public async Task<User?> GetUserByIdAsync(string id)
+        {
+            return await _userManager.Users.Include(u => u.Accounts).FirstOrDefaultAsync(u => u.Id == id);
+        }
+
+        public async Task<User> CreateUserAsync(User user, string password)
+        {
+            var result = await _userManager.CreateAsync(user, password);
+            if (!result.Succeeded)
+            {
+                throw new Exception(string.Join("\n", result.Errors.Select(e => e.Description)));
+            }
+
+            return user;
+        }
+
+        public async Task<bool> UpdateUserAsync(string id, User user)
+        {
+            var existingUser = await _userManager.FindByIdAsync(id);
+            if (existingUser == null)
+            {
+                return false;
+            }
+
+            existingUser.FavoriteAnimal = user.FavoriteAnimal;
+
+            var result = await _userManager.UpdateAsync(existingUser);
+            return result.Succeeded;
+        }
+
+        public async Task<bool> DeleteUserAsync(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return false;
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            return result.Succeeded;
+        }
+
+        public async Task<bool> AddAccountToUserAsync(string userId, Account account)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return false;
+            }
+
+            user.Accounts ??= new List<Account>();
+            user.Accounts.Add(account);
+
+            _context.Accounts.Add(account);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> RemoveAccountFromUserAsync(string userId, string accountId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return false;
+            }
+
+            var account = user.Accounts?.FirstOrDefault(a => a.Id == accountId);
+            if (account == null)
+            {
+                return false;
+            }
+
+            user.Accounts.Remove(account);
+            _context.Accounts.Remove(account);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

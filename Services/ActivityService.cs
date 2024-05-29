@@ -2,13 +2,13 @@
 using EFGetStarted.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace ActivityService.Services
+namespace BankBackend.Services
 {
     public interface IActivityService
     {
         Task<IEnumerable<Activity>> GetActivitiesAsync();
         Task<Activity?> GetActivityByIdAsync(string id);
-        Task<Activity> CreateActivityAsync(Activity activity);
+        Task<Activity> CreateActivityAsync(Activity activity, string accountID);
         Task<bool> UpdateActivityAsync(string id, Activity activity);
         Task<bool> DeleteActivityAsync(string id);
     }
@@ -16,10 +16,12 @@ namespace ActivityService.Services
     public class ActivityService : IActivityService
     {
         private readonly ApplicationDbContext _context;
+        private readonly AccountService _accountService;
 
-        public ActivityService(ApplicationDbContext context)
+        public ActivityService(ApplicationDbContext context, AccountService userService)
         {
             _context = context;
+            _accountService = userService;
         }
 
         public async Task<IEnumerable<Activity>> GetActivitiesAsync()
@@ -32,8 +34,10 @@ namespace ActivityService.Services
             return await _context.Activities.FindAsync(id);
         }
 
-        public async Task<Activity> CreateActivityAsync(Activity activity)
+        public async Task<Activity> CreateActivityAsync(Activity activity, string accountID)
         {
+            activity.Created = new DateTime();
+            activity.Account = await _accountService.GetAccountByIdAsync(accountID);
             _context.Activities.Add(activity);
             await _context.SaveChangesAsync();
             return activity;

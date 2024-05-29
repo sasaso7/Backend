@@ -1,7 +1,11 @@
-﻿using EFGetStarted;
+﻿using BankBackend.Helpers;
+using BankBackend.Services;
+using EFGetStarted;
 using EFGetStarted.Database;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -10,12 +14,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Random API", Version = "v1" });
 
     // Configure Swagger to use bearer token authentication
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -43,12 +49,36 @@ builder.Services.AddSwaggerGen(c =>
         });
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IActivityService, ActivityService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+    //options.AddPolicy("SameUserPolicy", policy => policy.Requirements.Add(new SameUserRequirement()));
+});
+
 builder.Services.AddAuthentication(options => options.DefaultScheme = IdentityConstants.ApplicationScheme)
     .AddCookie(IdentityConstants.ApplicationScheme)
     .AddBearerToken(IdentityConstants.BearerScheme);
 
-var connectionString = builder.Configuration.GetConnectionString("Database");
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Events = new CookieAuthenticationEvents
+    {
+        OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        },
+        OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        }
+    };
+});
 
 // Configure Identity Core with PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -57,6 +87,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 builder.Services.AddIdentityCore<User>(config => config.SignIn.RequireConfirmedEmail = false)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddApiEndpoints();
 
@@ -79,6 +110,11 @@ if (app.Environment.IsDevelopment())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         dbContext.Database.Migrate();
+
+
+        //We seed the database
+        var services = scope.ServiceProvider;
+        await SeedData.Initialize(services);
     }
 }
 
@@ -92,5 +128,8 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapIdentityApi<User>();
+app.MapControllers();
+
+app.UseMiddleware<CustomAuthorizationMiddleware>();
 
 app.Run();

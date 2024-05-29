@@ -11,6 +11,6 @@ namespace EFGetStarted.Database
     public class User : IdentityUser
     {
         public string? FavoriteAnimal { get; set; }
-        internal List<Account>? Accounts { get; set; }
+        public List<Account> Accounts { get; set; } = new List<Account>();
     }
 }

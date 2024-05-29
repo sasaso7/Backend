@@ -1,14 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankBackend.Database.Models
 {
     public class Account
     {
-        public required string Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string? Id { get; set; }
         public string? Picture { get; set; }
+        public string UserId { get; set; }  // Foreign key property
+    }
+
+    public class CreateAccountRequest
+    {
+        public string? Picture { get; set; }
+        public required string UserId { get; set; }
     }
 }
