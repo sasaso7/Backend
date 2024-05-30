@@ -24,6 +24,11 @@ namespace EFGetStarted.Database
             .HasForeignKey(a => a.UserId)
             .IsRequired();
 
+            builder.Entity<Activity>()
+            .HasOne(a => a.Account)
+            .WithMany()
+            .HasForeignKey(a => a.AccountId);
+
             builder.HasDefaultSchema("BankServer");
         }
     }

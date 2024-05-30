@@ -9,9 +9,13 @@ namespace BankBackend.Database.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? Id { get; set; }
-        public required Account Account { get; set;}
-        public required string Name { get; set;}
-        public string? Description { get; set;}
+        [Required]
+        public string AccountId { get; set; } // Foreign key property
+        [Required]
+        public Account Account { get; set; } // Navigation property
+        [Required]
+        public string Name { get; set; }
+        public string? Description { get; set; }
         public DateTime Created { get; set; }
     }
 
@@ -20,6 +24,5 @@ namespace BankBackend.Database.Models
         public required string AccountID { get; set; }
         public required string Name { get; set; }
         public string? Description { get; set; }
-        public DateTime Created { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using BankBackend.Database.Models;
 using BankBackend.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankBackend.Controllers
@@ -60,17 +61,35 @@ namespace BankBackend.Controllers
         // POST: api/Account
         [HttpPost]
 
-        public async Task<IActionResult> AddAccountToUser(Account account)
+        public async Task<IActionResult> AddAccountToUser(CreateAccountRequest account)
         {
             try
             {
-                var createdAccount = await _accountService.CreateAccountAsync(account.UserId, account);
+                var createdAccount = await _accountService.CreateAccountAsync(account);
                 return CreatedAtAction(nameof(GetAccount), new { id = createdAccount.Id }, createdAccount);
             }
             catch (ArgumentException ex)
             {
                 return NotFound(ex.Message);
             }
+        }
+
+        // POST: /Accounts/{id}/UploadPicture
+        [HttpPost("{id}/UploadPicture")]
+        public async Task<IActionResult> UploadPicture(string id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Invalid file.");
+            }
+
+            var result = await _accountService.UploadAccountPictureAsync(id, file);
+            if (!result)
+            {
+                return NotFound("Account not found.");
+            }
+
+            return NoContent();
         }
 
         // DELETE: api/Account/5

@@ -8,7 +8,7 @@ namespace BankBackend.Services
     {
         Task<IEnumerable<Activity>> GetActivitiesAsync();
         Task<Activity?> GetActivityByIdAsync(string id);
-        Task<Activity> CreateActivityAsync(Activity activity, string accountID);
+        Task<Activity> CreateActivityAsync(CreateActivity activity, string accountID);
         Task<bool> UpdateActivityAsync(string id, Activity activity);
         Task<bool> DeleteActivityAsync(string id);
     }
@@ -16,17 +16,19 @@ namespace BankBackend.Services
     public class ActivityService : IActivityService
     {
         private readonly ApplicationDbContext _context;
-        private readonly AccountService _accountService;
+        private readonly IAccountService _accountService;
 
-        public ActivityService(ApplicationDbContext context, AccountService userService)
+        public ActivityService(ApplicationDbContext context, IAccountService accountService)
         {
             _context = context;
-            _accountService = userService;
+            _accountService = accountService;
         }
 
         public async Task<IEnumerable<Activity>> GetActivitiesAsync()
         {
-            return await _context.Activities.ToListAsync();
+            return await _context.Activities
+                                  .Include(a => a.Account)
+                                  .ToListAsync();
         }
 
         public async Task<Activity?> GetActivityByIdAsync(string id)
@@ -34,13 +36,14 @@ namespace BankBackend.Services
             return await _context.Activities.FindAsync(id);
         }
 
-        public async Task<Activity> CreateActivityAsync(Activity activity, string accountID)
+        public async Task<Activity> CreateActivityAsync(CreateActivity activity, string accountID)
         {
-            activity.Created = new DateTime();
-            activity.Account = await _accountService.GetAccountByIdAsync(accountID);
-            _context.Activities.Add(activity);
+            Account account = await _accountService.GetAccountByIdAsync(accountID);
+            Activity newActivity = new Activity { Account = account, Name = activity.Name, Created = DateTime.UtcNow, Description = activity.Description };
+
+            _context.Activities.Add(newActivity);
             await _context.SaveChangesAsync();
-            return activity;
+            return newActivity;
         }
 
         public async Task<bool> UpdateActivityAsync(string id, Activity activity)

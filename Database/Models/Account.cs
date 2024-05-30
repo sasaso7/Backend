@@ -10,12 +10,13 @@ namespace BankBackend.Database.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string? Id { get; set; }
         public string? Picture { get; set; }
+        public string? Name { get; set; }
         public string UserId { get; set; }  // Foreign key property
     }
 
     public class CreateAccountRequest
     {
-        public string? Picture { get; set; }
+        public required string Name { get; set; }
         public required string UserId { get; set; }
     }
 }

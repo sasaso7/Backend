@@ -59,9 +59,9 @@ namespace BankBackend.Controllers
 
         // POST: api/Activity
         [HttpPost]
-        public async Task<ActionResult<Activity>> PostActivity(Activity activity)
+        public async Task<ActionResult<Activity>> PostActivity(CreateActivity activity)
         {
-            var createdActivity = await _activityService.CreateActivityAsync(activity);
+            var createdActivity = await _activityService.CreateActivityAsync(activity, activity.AccountID);
             return CreatedAtAction(nameof(GetActivity), new { id = createdActivity.Id }, createdActivity);
         }
 

@@ -13,10 +13,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-
+using System.Threading.Tasks;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+// Add services to the DI container
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(c =>
@@ -30,36 +31,37 @@ builder.Services.AddSwaggerGen(c =>
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
-        Scheme = "bearer" // lowercase, as defined in AddBearerToken method
+        Scheme = "bearer"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
+            new OpenApiSecurityScheme
             {
-                new OpenApiSecurityScheme
+                Reference = new OpenApiReference
                 {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                new string[] {}
-            }
-        });
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
 });
 
+// Register your services here
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IActivityService, ActivityService>();
 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
-    //options.AddPolicy("SameUserPolicy", policy => policy.Requirements.Add(new SameUserRequirement()));
 });
 
-builder.Services.AddAuthentication(options => options.DefaultScheme = IdentityConstants.ApplicationScheme)
+builder.Services.AddAuthentication(options =>
+    options.DefaultScheme = IdentityConstants.ApplicationScheme)
     .AddCookie(IdentityConstants.ApplicationScheme)
     .AddBearerToken(IdentityConstants.BearerScheme);
 
@@ -86,7 +88,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Database"));
 });
 
-builder.Services.AddIdentityCore<User>(config => config.SignIn.RequireConfirmedEmail = false)
+builder.Services.AddIdentityCore<User>(config =>
+    config.SignIn.RequireConfirmedEmail = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddApiEndpoints();
@@ -111,8 +114,7 @@ if (app.Environment.IsDevelopment())
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         dbContext.Database.Migrate();
 
-
-        //We seed the database
+        // Seed the database
         var services = scope.ServiceProvider;
         await SeedData.Initialize(services);
     }
@@ -120,8 +122,6 @@ if (app.Environment.IsDevelopment())
 
 // Ensure DefaultFiles middleware is used before StaticFiles
 app.UseDefaultFiles();
-
-// Use StaticFiles middleware to serve static files
 app.UseStaticFiles();
 
 app.UseHttpsRedirection();
