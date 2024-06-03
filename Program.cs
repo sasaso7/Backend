@@ -3,6 +3,7 @@ using BankBackend.Services;
 using EFGetStarted;
 using EFGetStarted.Database;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -57,7 +58,14 @@ builder.Services.AddScoped<IActivityService, ActivityService>();
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+    var policy = new AuthorizationPolicyBuilder(IdentityConstants.ApplicationScheme, IdentityConstants.BearerScheme)
+     .RequireAuthenticatedUser()
+     .Build();
+    options.DefaultPolicy = policy;
+
+    var adminPolicy = new AuthorizationPolicyBuilder(IdentityConstants.ApplicationScheme, IdentityConstants.BearerScheme).RequireRole("Admin").Build();
+
+    options.AddPolicy("AdminPolicy", adminPolicy);
 });
 
 builder.Services.AddAuthentication(options =>

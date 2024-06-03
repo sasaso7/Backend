@@ -19,6 +19,7 @@ namespace BankBackend.Controllers
 
         // GET: api/Activity
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Activity>>> GetActivities()
         {
             var activities = await _activityService.GetActivitiesAsync();
