@@ -106,13 +106,13 @@ builder.Services.AddTransient<IEmailSender<User>, DummyEmailSender>();
 
 WebApplication app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
+app.UseSwagger();
+app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API V1");
     });
+if (app.Environment.IsDevelopment())
+{
 
     app.UseDeveloperExceptionPage();
 
@@ -131,6 +131,10 @@ if (app.Environment.IsDevelopment())
 // Ensure DefaultFiles middleware is used before StaticFiles
 app.UseDefaultFiles();
 app.UseStaticFiles();
+
+
+//Config of CORS
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
