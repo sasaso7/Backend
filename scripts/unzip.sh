@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Navigate to the destination directory
-cd /var/www/app/
+cd /home/ec2-user/app
 
 # Unzip the .zip file
 unzip deploy.zip
