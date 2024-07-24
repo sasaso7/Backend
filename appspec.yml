@@ -4,11 +4,18 @@ files:
   - source: /
     destination: /home/ec2-user/app
 hooks:
+  ApplicationUnzip:
+    - location: scripts/unzip.sh
+      timeout: 600
+      runas: root
   ApplicationStop:
-    - location: stop_compose.sh
+    - location: scripts/stop_compose.sh
       timeout: 300
       runas: root
   AfterInstall:
-    - location: deploy.sh
+    - location: scripts/deploy.sh
       timeout: 600
       runas: root
+
+
+     
