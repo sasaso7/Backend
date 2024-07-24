@@ -8,11 +8,11 @@ hooks:
     - location: scripts/stop_compose.sh
       timeout: 300
       runas: root
-  BeforeInstall:
+  AfterInstall:
     - location: scripts/unzip.sh
       timeout: 600
       runas: root
-  AfterInstall:
+  ApplicationStart:
     - location: scripts/deploy.sh
       timeout: 600
       runas: root
