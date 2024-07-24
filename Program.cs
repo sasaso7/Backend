@@ -111,8 +111,8 @@ app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API V1");
     });
-//if (app.Environment.IsDevelopment())
-//{
+if (app.Environment.IsDevelopment())
+{
 
     app.UseDeveloperExceptionPage();
 
@@ -125,8 +125,8 @@ app.UseSwaggerUI(c =>
         // Seed the database
         var services = scope.ServiceProvider;
         await SeedData.Initialize(services);
-    }
-//}
+}
+}
 
 // Ensure DefaultFiles middleware is used before StaticFiles
 app.UseDefaultFiles();

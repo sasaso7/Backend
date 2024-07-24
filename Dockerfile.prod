@@ -5,7 +5,7 @@ EXPOSE 8080
 EXPOSE 8081
 
 # Copy the published application to the final stage
-COPY ./publish .
+COPY ./ .
 
 # Set the ASPNETCORE_URLS environment variable
 ENV ASPNETCORE_URLS=http://+:8080
