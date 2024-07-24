@@ -5,10 +5,10 @@ files:
     destination: /home/ec2-user/app
 hooks:
   ApplicationStop:
-    - location: scripts/stop_compose.sh
+    - location: stop_compose.sh
       timeout: 300
       runas: root
   AfterInstall:
-    - location: scripts/deploy.sh
+    - location: deploy.sh
       timeout: 600
       runas: root
