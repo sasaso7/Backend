@@ -4,7 +4,7 @@
 cd /var/www/app/
 
 # Unzip the .zip file
-unzip my-application.zip
+unzip deploy.zip
 
 # Optionally, remove the .zip file after extraction
-rm my-application.zip
+rm deploy.zip
