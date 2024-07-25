@@ -4,7 +4,7 @@
 cd /home/ec2-user/app
 
 # Unzip the .zip file
-unzip deploy.zip
+unzip -o deploy.zip
 
 # Optionally, remove the .zip file after extraction
 rm deploy.zip
