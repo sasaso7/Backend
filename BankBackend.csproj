@@ -41,5 +41,8 @@
 	<ItemGroup>
 	  <Content Remove="wwwroot\.editorconfig" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="wwwroot\frutiger-bg.png" />
+	</ItemGroup>
 
 </Project>

@@ -30,40 +30,76 @@
             height: 100%;
             justify-content: space-around;
             align-items: center;
+            flex-direction:column;
         }
+        @media screen and (min-width: 768px) {
+            #buttonBox {
+                display: flex;
+                width: 100%;
+                height: 100%;
+                justify-content: space-around;
+                align-items: center;
+                flex-direction: row;
+            }
+        }
+
         .buttons {
-            width: 35%;
-            height: auto;
-            background-color: unset;
             border: none;
+            outline: solid 1px #757575;
+            box-shadow: inset 0px 0px 0px 1px #fcfcfc;
+            color: black;
+            padding: 3px;
+            background: rgb(207,207,207);
+            background: linear-gradient(0deg, rgba(207,207,207,1) 0%, rgb(236, 233, 233) 49%, rgba(235,235,235,1) 49%, rgba(252,252,252,1) 100%);
+            width: 20vw;
+            aspect-ratio: 1 / 1;
+            min-width: 45px;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 8vw;
         }
         body {
-            background: linear-gradient(-45deg, #aca6a6, #505050, #808080, #aca6a6);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
+            background-image: url("/frutiger-bg.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
             overflow: hidden
         }
+        @font-face {
+            font-family: SegoeUI;
+            src: local("Segoe UI Light"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.woff2) format("woff2"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.woff) format("woff"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/light/latest.ttf) format("truetype");
+            font-weight: 100;
+        }
 
-        @keyframes gradient {
-            0% {
-                background-position: 0% 50%;
-            }
+        @font-face {
+            font-family: SegoeUI;
+            src: local("Segoe UI Semilight"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.woff2) format("woff2"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.woff) format("woff"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semilight/latest.ttf) format("truetype");
+            font-weight: 200;
+        }
 
-            50% {
-                background-position: 100% 50%;
-            }
+        @font-face {
+            font-family: SegoeUI;
+            src: local("Segoe UI"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.woff2) format("woff2"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.woff) format("woff"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/normal/latest.ttf) format("truetype");
+            font-weight: 400;
+        }
 
-            100% {
-                background-position: 0% 50%;
-            }
+        @font-face {
+            font-family: SegoeUI;
+            src: local("Segoe UI Bold"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.woff2) format("woff2"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.woff) format("woff"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/bold/latest.ttf) format("truetype");
+            font-weight: 600;
+        }
+
+        @font-face {
+            font-family: SegoeUI;
+            src: local("Segoe UI Semibold"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.woff2) format("woff2"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.woff) format("woff"), url(//c.s-microsoft.com/static/fonts/segoe-ui/west-european/semibold/latest.ttf) format("truetype");
+            font-weight: 700;
         }
     </style>
 </head>
 <body>
     <div id="buttonBox">
-    <button onclick="handleGoToSwagger()" class="buttons"><img src="/android-chrome-512x512.png" alt="Logo" /></button>
-    <button onclick="handleGoToFrontend()" class="buttons"><img src="/frontend.png" alt="Logo" /></button>
+    <button onclick="handleGoToSwagger()" class="buttons">B</button>
+    <button onclick="handleGoToFrontend()" class="buttons">F</button>
     </div>
 </body>
 
