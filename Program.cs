@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Threading.Tasks;
 
@@ -96,8 +97,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Database"));
 });
 
-builder.Services.AddIdentityCore<User>(config =>
-    config.SignIn.RequireConfirmedEmail = false)
+builder.Services.AddIdentityCore<User>(config => {
+    config.SignIn.RequireConfirmedEmail = false;
+    config.Password.RequireDigit = false;
+    config.Password.RequireLowercase = false;
+    config.Password.RequireNonAlphanumeric = false;
+    config.Password.RequireUppercase = false;
+    config.Password.RequiredLength = 6; // Set minimum length
+    config.Password.RequiredUniqueChars = 1;
+
+})
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddApiEndpoints();
