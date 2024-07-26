@@ -2,6 +2,7 @@
 using EFGetStarted.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BankBackend.Services
 {
@@ -14,17 +15,20 @@ namespace BankBackend.Services
         Task<bool> DeleteUserAsync(string id);
         Task<bool> AddAccountToUserAsync(string userId, Account account);
         Task<bool> RemoveAccountFromUserAsync(string userId, string accountId);
+        Task<User?> GetUserByIdOrCurrentAsync(string? id = null);
     }
 
     public class UserService : IUserService
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(UserManager<User> userManager, ApplicationDbContext context)
+        public UserService(UserManager<User> userManager, ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IEnumerable<User>> GetUsersAsync()
@@ -110,6 +114,27 @@ namespace BankBackend.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<User?> GetUserByIdOrCurrentAsync(string? id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return await GetCurrentUserAsync();
+            }
+
+            return await GetUserByIdAsync(id);
+        }
+
+        private async Task<User?> GetCurrentUserAsync()
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
+            {
+                return null;
+            }
+
+            return await _userManager.GetUserAsync(httpContext.User);
         }
     }
 }

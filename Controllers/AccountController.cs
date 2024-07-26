@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BankBackend.Controllers
 {
+    [Authorize]
     [Route("/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -18,7 +19,7 @@ namespace BankBackend.Controllers
         }
 
         // GET: api/Accounts
-        [HttpGet]
+        [HttpGet("/Accounts")]
         [Authorize(Policy = "AdminPolicy")]
         public async Task<ActionResult<IEnumerable<Account>>> GetAccounts()
         {

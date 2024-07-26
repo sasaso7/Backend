@@ -7,7 +7,9 @@ namespace BankBackend.Services
     public interface IActivityService
     {
         Task<IEnumerable<Activity>> GetActivitiesAsync();
-        Task<Activity?> GetActivityByIdAsync(string id);
+        Task<Activity?> GetActivityByIdAsync(string accountId);
+
+        Task<IEnumerable<Activity>> GetAccountActivities(string id);
         Task<Activity> CreateActivityAsync(CreateActivity activity, string accountID);
         Task<bool> UpdateActivityAsync(string id, Activity activity);
         Task<bool> DeleteActivityAsync(string id);
@@ -17,11 +19,13 @@ namespace BankBackend.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IAccountService _accountService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ActivityService(ApplicationDbContext context, IAccountService accountService)
+        public ActivityService(ApplicationDbContext context, IAccountService accountService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _accountService = accountService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IEnumerable<Activity>> GetActivitiesAsync()
@@ -34,6 +38,13 @@ namespace BankBackend.Services
         public async Task<Activity?> GetActivityByIdAsync(string id)
         {
             return await _context.Activities.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<Activity>> GetAccountActivities(string accountId)
+        {
+            return await _context.Activities
+                .Where(a => a.AccountId == accountId)
+                .ToListAsync();
         }
 
         public async Task<Activity> CreateActivityAsync(CreateActivity activity, string accountID)

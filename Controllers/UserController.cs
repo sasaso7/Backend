@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace BankBackend.Controllers
 {
+    [Authorize]
     [Route("/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -23,24 +24,28 @@ namespace BankBackend.Controllers
         }
 
         // GET: /Users
-        [HttpGet]
+        [HttpGet("/Users")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             var users = await _userService.GetUsersAsync();
             return Ok(users);
         }
 
-        // GET: /User/5
+        [HttpGet]
+        public async Task<ActionResult<User>> GetCurrentUser()
+        {
+            return await GetUser(null);
+        }
+
+        // GET: api/User/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(string id)
         {
-            var user = await _userService.GetUserByIdAsync(id);
-
+            var user = await _userService.GetUserByIdOrCurrentAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
-
             return Ok(user);
         }
 

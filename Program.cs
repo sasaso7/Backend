@@ -91,6 +91,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
+// Add HttpContextAccessor
+builder.Services.AddHttpContextAccessor();
+
 // Configure Identity Core with PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {

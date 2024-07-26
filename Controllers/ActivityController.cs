@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BankBackend.Controllers
 {
+    [Authorize]
     [Route("/[controller]")]
     [ApiController]
     public class ActivitiesController : ControllerBase
@@ -19,7 +20,6 @@ namespace BankBackend.Controllers
 
         // GET: api/Activity
         [HttpGet]
-        [Authorize]
         public async Task<ActionResult<IEnumerable<Activity>>> GetActivities()
         {
             var activities = await _activityService.GetActivitiesAsync();
