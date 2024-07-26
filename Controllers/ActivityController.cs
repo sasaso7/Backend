@@ -18,7 +18,7 @@ namespace BankBackend.Controllers
             _activityService = activityService;
         }
 
-        // GET: api/Activity
+        // GET: api/Activity/all
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<Activity>>> GetAllActivities()
         {
@@ -26,7 +26,7 @@ namespace BankBackend.Controllers
             return Ok(activities);
         }
 
-        // GET: api/Activities/accountId
+        // GET: api/Activity/all/accountId
         [HttpGet("all/{accountId}")]
         public async Task<ActionResult<IEnumerable<Activity>>> GetAllAccountActivities(string accountId)
         {
