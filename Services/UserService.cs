@@ -134,7 +134,15 @@ namespace BankBackend.Services
                 return null;
             }
 
-            return await _userManager.GetUserAsync(httpContext.User);
+            var user = await _userManager.GetUserAsync(httpContext.User);
+            if (user != null)
+            {
+                await _context.Entry(user)
+                    .Collection(u => u.Accounts)
+                    .LoadAsync();
+            }
+
+            return user;
         }
     }
 }

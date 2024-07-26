@@ -28,10 +28,10 @@ namespace BankBackend.Controllers
         }
 
         // GET: api/Account/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Account>> GetAccount(string id)
+        [HttpGet("{id}", Name = "GetAccount")]
+        public async Task<ActionResult<Account>> GetAccount(string accountId)
         {
-            var account = await _accountService.GetAccountByIdAsync(id);
+            var account = await _accountService.GetAccountByIdAsync(accountId);
 
             if (account == null)
             {
@@ -42,15 +42,11 @@ namespace BankBackend.Controllers
         }
 
         // PUT: api/Account/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAccount(string id, Account account)
+        [HttpPut("{accountId}")]
+        public async Task<IActionResult> PutAccount(Account account)
         {
-            if (id != account.Id)
-            {
-                return BadRequest();
-            }
 
-            var result = await _accountService.UpdateAccountAsync(id, account);
+            var result = await _accountService.UpdateAccountAsync(account);
             if (!result)
             {
                 return NotFound();
@@ -61,13 +57,12 @@ namespace BankBackend.Controllers
 
         // POST: api/Account
         [HttpPost]
-
         public async Task<IActionResult> AddAccountToUser(CreateAccountRequest account)
         {
             try
             {
                 var createdAccount = await _accountService.CreateAccountAsync(account);
-                return CreatedAtAction(nameof(GetAccount), new { id = createdAccount.Id }, createdAccount);
+                return CreatedAtRoute("GetAccount", new { id = createdAccount.Id }, createdAccount);
             }
             catch (ArgumentException ex)
             {

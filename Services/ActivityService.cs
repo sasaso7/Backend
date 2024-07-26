@@ -7,8 +7,8 @@ namespace BankBackend.Services
     public interface IActivityService
     {
         Task<IEnumerable<Activity>> GetActivitiesAsync();
+        Task<IEnumerable<Activity>> GetAccountActivitiesAsync(string accountId);
         Task<Activity?> GetActivityByIdAsync(string accountId);
-
         Task<IEnumerable<Activity>> GetAccountActivities(string id);
         Task<Activity> CreateActivityAsync(CreateActivity activity, string accountID);
         Task<bool> UpdateActivityAsync(string id, Activity activity);
@@ -32,6 +32,13 @@ namespace BankBackend.Services
         {
             return await _context.Activities
                                   .Include(a => a.Account)
+                                  .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Activity>> GetAccountActivitiesAsync(string accountId)
+        {
+            return await _context.Activities
+                                  .Where(a => a.AccountId == accountId)
                                   .ToListAsync();
         }
 

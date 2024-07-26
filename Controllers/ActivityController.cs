@@ -9,28 +9,36 @@ namespace BankBackend.Controllers
     [Authorize]
     [Route("/[controller]")]
     [ApiController]
-    public class ActivitiesController : ControllerBase
+    public class ActivityController : ControllerBase
     {
         private readonly IActivityService _activityService;
 
-        public ActivitiesController(IActivityService activityService)
+        public ActivityController(IActivityService activityService)
         {
             _activityService = activityService;
         }
 
         // GET: api/Activity
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Activity>>> GetActivities()
+        [HttpGet("all")]
+        public async Task<ActionResult<IEnumerable<Activity>>> GetAllActivities()
         {
             var activities = await _activityService.GetActivitiesAsync();
             return Ok(activities);
         }
 
-        // GET: api/Activity/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Activity>> GetActivity(string id)
+        // GET: api/Activities/accountId
+        [HttpGet("all/{accountId}")]
+        public async Task<ActionResult<IEnumerable<Activity>>> GetAllAccountActivities(string accountId)
         {
-            var activity = await _activityService.GetActivityByIdAsync(id);
+            var activities = await _activityService.GetAccountActivitiesAsync(accountId);
+            return Ok(activities);
+        }
+
+        // GET: api/Activity/5
+        [HttpGet("{activityId}", Name = "GetActivity")]
+        public async Task<ActionResult<Activity>> GetActivity(string activityId)
+        {
+            var activity = await _activityService.GetActivityByIdAsync(activityId);
 
             if (activity == null)
             {
@@ -41,15 +49,15 @@ namespace BankBackend.Controllers
         }
 
         // PUT: api/Activity/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutActivity(string id, Activity activity)
+        [HttpPut("{activityId}")]
+        public async Task<IActionResult> PutActivity(string activityId, Activity activity)
         {
-            if (id != activity.Id)
+            if (activityId != activity.Id)
             {
                 return BadRequest();
             }
 
-            var result = await _activityService.UpdateActivityAsync(id, activity);
+            var result = await _activityService.UpdateActivityAsync(activityId, activity);
             if (!result)
             {
                 return NotFound();
@@ -63,7 +71,7 @@ namespace BankBackend.Controllers
         public async Task<ActionResult<Activity>> PostActivity(CreateActivity activity)
         {
             var createdActivity = await _activityService.CreateActivityAsync(activity, activity.AccountID);
-            return CreatedAtAction(nameof(GetActivity), new { id = createdActivity.Id }, createdActivity);
+            return CreatedAtRoute("GetActivity", new { activityId = createdActivity.Id }, createdActivity);
         }
 
         // DELETE: api/Activity/5

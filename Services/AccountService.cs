@@ -14,7 +14,7 @@ namespace BankBackend.Services
         Task<bool> UploadAccountPictureAsync(string accountId, IFormFile file);
         Task<Account?> GetAccountByIdAsync(string id);
         Task<Account> CreateAccountAsync(CreateAccountRequest account);
-        Task<bool> UpdateAccountAsync(string id, Account account);
+        Task<bool> UpdateAccountAsync(Account account);
         Task<bool> DeleteAccountAsync(string id);
     }
     public class AccountService : IAccountService
@@ -118,12 +118,8 @@ namespace BankBackend.Services
             return newAccount;
         }
 
-        public async Task<bool> UpdateAccountAsync(string id, Account account)
+        public async Task<bool> UpdateAccountAsync(Account account)
         {
-            if (id != account.Id)
-            {
-                return false;
-            }
 
             _context.Entry(account).State = EntityState.Modified;
 
@@ -134,7 +130,7 @@ namespace BankBackend.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await AccountExistsAsync(id))
+                if (!await AccountExistsAsync(account.Id))
                 {
                     return false;
                 }
