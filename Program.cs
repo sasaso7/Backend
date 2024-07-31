@@ -69,6 +69,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminPolicy", adminPolicy);
 });
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddAuthentication(options =>
     options.DefaultScheme = IdentityConstants.ApplicationScheme)
     .AddCookie(IdentityConstants.ApplicationScheme)
