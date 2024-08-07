@@ -15,7 +15,7 @@ namespace BankBackend.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IActivityService _activityService;
         private const string KanyeApiUrl = "https://api.kanye.rest/";
-        private const string RandomFactApiUrl = "https://uselessfacts.jsph.pl/api/v2/facts/random"
+        private const string RandomFactApiUrl = "https://uselessfacts.jsph.pl/api/v2/facts/random";
 
         public ExternalAPIController(IHttpClientFactory httpClientFactory, IActivityService activityService)
         {
