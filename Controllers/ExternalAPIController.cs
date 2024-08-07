@@ -15,6 +15,7 @@ namespace BankBackend.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IActivityService _activityService;
         private const string KanyeApiUrl = "https://api.kanye.rest/";
+        private const string RandomFactApiUrl = "https://uselessfacts.jsph.pl/api/v2/facts/random"
 
         public ExternalAPIController(IHttpClientFactory httpClientFactory, IActivityService activityService)
         {
@@ -23,7 +24,7 @@ namespace BankBackend.Controllers
         }
 
         [HttpPost("quote")]
-        public async Task<IActionResult> GetKanyeQuote([FromBody] KanyeQuoteRequest request)
+        public async Task<IActionResult> GetKanyeQuote([FromBody] ExternalAPIRequest request)
         {
             try
             {
@@ -54,10 +55,41 @@ namespace BankBackend.Controllers
             }
         }
 
+        [HttpPost("randomfact")]
+        public async Task<IActionResult> GetRandomFact([FromBody] ExternalAPIRequest request)
+        {
+            try
+            {
+                // Call the Random Fact API
+                var httpClient = _httpClientFactory.CreateClient();
+                var response = await httpClient.GetAsync(RandomFactApiUrl);
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+
+                // Deserialize the JSON response
+                var factResponse = JsonSerializer.Deserialize<RandomFactResponse>(content);
+
+                // Create a new activity
+                var createActivity = new CreateActivity
+                {
+                    AccountID = request.AccountID,
+                    Name = "Random Fact",
+                    Description = factResponse.text
+                };
+                var newActivity = await _activityService.CreateActivityAsync(createActivity, request.AccountID);
+
+                return Ok(new { fact = factResponse.text });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
         // You can add more methods here for other endpoints in the future
     }
 
-    public class KanyeQuoteRequest
+    public class ExternalAPIRequest
     {
         public required string AccountID { get; set; }
     }
@@ -65,5 +97,14 @@ namespace BankBackend.Controllers
     public class KanyeQuoteResponse
     {
         public string quote { get; set; }
+    }
+    public class RandomFactResponse
+    {
+        public string id { get; set; }
+        public string text { get; set; }
+        public string source { get; set; }
+        public string source_url { get; set; }
+        public string language { get; set; }
+        public string permalink { get; set; }
     }
 }
