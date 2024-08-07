@@ -78,7 +78,7 @@ namespace BankBackend.Controllers
                 };
                 var newActivity = await _activityService.CreateActivityAsync(createActivity, request.AccountID);
 
-                return Ok(factResponse);
+                return Ok(new { fact = factResponse.text, origin = factResponse.source, originURL = factResponse.source_url });
             }
             catch (Exception ex)
             {
