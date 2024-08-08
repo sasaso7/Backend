@@ -1,17 +1,16 @@
 version: '3.9'
-
 services:
   webapi:
     build:
       context: .
       dockerfile: Dockerfile.prod
+    container_name: backend-container
     ports:
       - "8080:8080"
     volumes:
       - .:/app
     networks:
       - app_network
-
 networks:
   app_network:
     driver: bridge
