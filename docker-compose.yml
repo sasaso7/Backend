@@ -4,9 +4,14 @@ services:
   webapi:
     build:
       context: .
-      #THE DOCKERFILE HERE NEEDS TO BE CHANGED IF YOU WANT TO RUN IT LOCALLY
       dockerfile: Dockerfile.prod
     ports:
-      - "80:8080"
+      - "8080:8080"
     volumes:
       - .:/app
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
