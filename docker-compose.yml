@@ -5,12 +5,22 @@ services:
       context: .
       dockerfile: Dockerfile.prod
     container_name: backend-container
-    ports:
-      - "8080:8080"
+    # ports:
+    #   - "8080:8080"  # We'll comment this out as Traefik will handle routing
     volumes:
       - .:/app
     networks:
       - app_network
+      - traefik-net  # Add this network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
+      - "traefik.http.routers.backend.middlewares=strip-api-prefix@docker"
+
 networks:
   app_network:
     driver: bridge
+  traefik-net:
+    external: true
