@@ -150,7 +150,7 @@ app.UseStaticFiles();
 //Config of CORS
 app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapIdentityApi<User>();
