@@ -9,9 +9,4 @@ services:
       - "8080:8080"
     volumes:
       - .:/app
-    networks:
-      - ec2-user_app-network
-
-networks:
-  ec2-user_app-network:
-    external: true
+    network_mode: "ec2-user_app-network"
