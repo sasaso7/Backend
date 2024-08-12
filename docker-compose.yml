@@ -10,7 +10,8 @@ services:
     volumes:
       - .:/app
     networks:
-      - app_network
+      - ec2-user_app-network
+
 networks:
-  app_network:
-    driver: bridge
+  ec2-user_app-network:
+    external: true
