@@ -6,12 +6,13 @@ on:
     inputs:
       environment:
         description: 'Deployment Environment'
-        required: false
+        required: true
         default: 'ec2'
         type: choice
         options:
         - ec2
         - azure
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -48,13 +49,22 @@ jobs:
           file: ./Dockerfile.prod
           push: true
           tags: phippedersen/dockerized-backend:latest
-  deploy-ec2:
+
+  deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event.inputs.environment == 'ec2' || github.event.inputs.environment == ''
-    environment: ec2
     steps:
-      - name: Deploy Backend to EC2
+      - name: Set environment
+        id: set_env
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "DEPLOY_ENV=ec2" >> $GITHUB_OUTPUT
+          else
+            echo "DEPLOY_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy to EC2
+        if: steps.set_env.outputs.DEPLOY_ENV == 'ec2'
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -66,17 +76,15 @@ jobs:
             docker rm backend-container || true
             docker run -d --name backend-container --network ec2-user_app-network -p 8080:8080 phippedersen/dockerized-backend:latest
             docker image prune -f
-  deploy-azure:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    if: github.event.inputs.environment == 'azure'
-    environment: azure
-    steps:
+
       - name: Login to Azure
+        if: steps.set_env.outputs.DEPLOY_ENV == 'azure'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Deploy to Azure Web App
+        if: steps.set_env.outputs.DEPLOY_ENV == 'azure'
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
