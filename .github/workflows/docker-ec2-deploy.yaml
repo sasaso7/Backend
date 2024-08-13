@@ -32,7 +32,10 @@ jobs:
             echo "Created appsettings.json from GitHub secret"
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: |
+          echo "Current directory contents:"
+          ls -l
+          dotnet restore
 
       - name: Build
         run: dotnet build --no-restore --configuration Release
