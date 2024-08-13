@@ -1,5 +1,4 @@
 name: .NET Backend CI/CD Pipeline
-
 on:
   push:
     branches: [main]
@@ -13,45 +12,35 @@ on:
         options:
         - ec2
         - azure
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.0.x'
-
       - name: Create appsettings.json
         run: |
           mkdir -p ./publish
           echo '${{ secrets.PROD_APPSETTINGS }}' > ./publish/appsettings.json
           echo "Created appsettings.json from GitHub secret"
-
       - name: Restore dependencies
         run: dotnet restore ./BankBackend.csproj
-
       - name: Build
         run: dotnet build ./BankBackend.csproj --no-restore --configuration Release
-
       - name: Test
         run: dotnet test ./BankBackend.csproj --no-build --verbosity normal
-
       - name: Publish
         run: dotnet publish ./BankBackend.csproj -c Release -o ./publish
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
@@ -59,8 +48,6 @@ jobs:
           file: ./Dockerfile.prod
           push: true
           tags: phippedersen/dockerized-backend:latest
-
-
   deploy-ec2:
     needs: build-and-push
     runs-on: ubuntu-latest
@@ -79,7 +66,6 @@ jobs:
             docker rm backend-container || true
             docker run -d --name backend-container --network ec2-user_app-network -p 8080:8080 phippedersen/dockerized-backend:latest
             docker image prune -f
-
   deploy-azure:
     needs: build-and-push
     runs-on: ubuntu-latest
@@ -90,7 +76,6 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
