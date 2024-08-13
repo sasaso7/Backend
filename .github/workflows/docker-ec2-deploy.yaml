@@ -51,7 +51,7 @@ jobs:
   deploy-ec2:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.event.inputs.environment == 'ec2' || github.event.inputs.environment == ''
+    if: github.event_name == 'push' || github.event.inputs.environment == 'ec2' || github.event.inputs.environment == ''
     environment: ec2
     steps:
       - name: Deploy Backend to EC2
