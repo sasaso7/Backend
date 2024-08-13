@@ -4,6 +4,9 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+#Copy the appsettings into image
+COPY ./publish/appsettings.json .
+
 # Copy the published application to the final stage
 COPY ./ .
 
