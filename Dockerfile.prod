@@ -1,17 +1,7 @@
-# Use the ASP.NET Core runtime image for the final stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
-
-#Copy the appsettings into image
-COPY ./publish/appsettings.json .
-
-# Copy the published application to the final stage
-COPY ./ .
-
-# Set the ASPNETCORE_URLS environment variable
+COPY ./publish .
 ENV ASPNETCORE_URLS=http://+:8080
-
-# Run the application
 ENTRYPOINT ["dotnet", "BankBackend.dll"]
