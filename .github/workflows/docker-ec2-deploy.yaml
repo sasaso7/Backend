@@ -7,7 +7,7 @@ on:
     inputs:
       environment:
         description: 'Deployment Environment'
-        required: true
+        required: false
         default: 'ec2'
         type: choice
         options:
