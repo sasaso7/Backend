@@ -7,7 +7,7 @@ on:
       environment:
         description: 'Deployment Environment'
         required: false
-        default: 'azure'
+        default: 'ec2'
         type: choice
         options:
         - azure
@@ -51,7 +51,7 @@ jobs:
   deploy-azure:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.event.inputs.environment == 'azure' || github.event.inputs.environment == ''
+    if: github.event.inputs.environment == 'azure'
     environment: azure
     steps:
       - name: Login to Azure
@@ -72,7 +72,7 @@ jobs:
   deploy-ec2:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.event.inputs.environment == 'ec2'
+    if: github.event.inputs.environment == 'ec2' || github.event.inputs.environment == ''
     environment: ec2
     steps:
       - name: Deploy Backend to EC2
