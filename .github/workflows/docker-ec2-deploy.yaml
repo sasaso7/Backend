@@ -7,11 +7,11 @@ on:
       environment:
         description: 'Deployment Environment'
         required: false
-        default: 'ec2'
+        default: 'azure'
         type: choice
         options:
-        - ec2
         - azure
+        - ec2
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -48,10 +48,31 @@ jobs:
           file: ./Dockerfile.prod
           push: true
           tags: phippedersen/dockerized-backend:latest
+  deploy-azure:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.event.inputs.environment == 'azure' || github.event.inputs.environment == ''
+    environment: azure
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          images: phippedersen/dockerized-backend:latest
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+            az webapp config appsettings set --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_WEBAPP_NAME }} --settings WEBSITES_PORT=8080
   deploy-ec2:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: github.event.inputs.environment == 'ec2' || github.event.inputs.environment == ''
+    if: github.event.inputs.environment == 'ec2'
     environment: ec2
     steps:
       - name: Deploy Backend to EC2
@@ -66,18 +87,3 @@ jobs:
             docker rm backend-container || true
             docker run -d --name backend-container --network ec2-user_app-network -p 8080:8080 phippedersen/dockerized-backend:latest
             docker image prune -f
-  deploy-azure:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    if: github.event.inputs.environment == 'azure'
-    environment: azure
-    steps:
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          images: phippedersen/dockerized-backend:latest

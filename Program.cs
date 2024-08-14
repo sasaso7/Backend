@@ -4,18 +4,9 @@ using EFGetStarted;
 using EFGetStarted.Database;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using System.Threading.Tasks;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -96,10 +87,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
 
-// Configure Identity Core with PostgreSQL
+// Configure Identity Core with SQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Database"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Database"));
 });
 
 builder.Services.AddIdentityCore<User>(config => {
