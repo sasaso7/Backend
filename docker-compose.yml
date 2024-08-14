@@ -1,0 +1,97 @@
+version: '3.7'
+
+services:
+  backend:
+    image: phippedersen/dockerized-backend:latest
+    deploy:
+      replicas: 1
+    networks:
+      - containednetwork
+
+  frontend:
+    image: phippedersen/dockerized-frontend:latest
+    deploy:
+      replicas: 1
+    networks:
+      - containednetwork
+
+  nginx:
+    image: nginx:latest
+    deploy:
+      replicas: 1
+    ports:
+      - "80:80"
+    networks:
+      - containednetwork
+    environment:
+      - |
+        NGINX_CONFIG=events {
+            worker_connections 1024;
+        }
+        http {
+            upstream frontend {
+                server frontend:80;
+            }
+            upstream backend {
+                server backend:8080;
+            }
+            server {
+                listen 80;
+                location /api {
+                    proxy_pass http://backend;
+                    proxy_set_header Host $$host;
+                    proxy_set_header X-Real-IP $$remote_addr;
+                    rewrite ^/api(.*)$$ $$1 break;
+                }
+                location / {
+                    proxy_pass http://frontend;
+                    proxy_set_header Host $$host;
+                    proxy_set_header X-Real-IP $$remote_addr;
+                    proxy_intercept_errors on;
+                    error_page 404 = /index.html;
+                }
+            }
+        }
+    command: /bin/sh -c "echo \"$$NGINX_CONFIG\" > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+
+  redis:
+    image: redis:alpine
+    deploy:
+      replicas: 1
+    networks:
+      - containednetwork
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    deploy:
+      replicas: 1
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+      - HTTP_USER=admin
+      - HTTP_PASSWORD=secretpassword
+    ports:
+      - "8081:8081"
+    networks:
+      - containednetwork
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    command: -H unix:///var/run/docker.sock
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    ports:
+      - "9000:9000"
+    networks:
+      - containednetwork
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+networks:
+  containednetwork:
+    driver: bridge
+
+volumes:
+  portainer_data:
